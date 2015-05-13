@@ -7,6 +7,7 @@ import sys
 
 from itertools import cycle
 
+errcount = 0
 
 class UrlReaderX(threading.Thread):
     def __init__(self, queue, output):
@@ -33,8 +34,16 @@ class UrlReaderX(threading.Thread):
                     self.queue.put(target)
             except Queue.Empty:
                 break
+	    except requests.exceptions.ConnectionError:
+#	        r.status_code = "Connection refused"
+#		print data.status_code
+#		print 'exception!'
+		global errcount 
+		errcount += 1
+		self.queue.task_done()
+                self.queue.put(target)
 
-errcount = 0
+#errcount = 0
 
 def load(urlrange, num_threads):
     mainqueue = Queue.Queue()
@@ -50,7 +59,7 @@ def load(urlrange, num_threads):
 
     lst = ['|', '/', '-', '\\']
     pool = cycle(lst)
-    brd = len(urlrange)
+    brd = len(mainqueue.__dict__['queue'])
     while True:
         if len(mainqueue.__dict__['queue']) == 0:
             break
@@ -59,6 +68,8 @@ def load(urlrange, num_threads):
         sys.stdout.flush()
 
     mainqueue.join()
+    global errcount
+    print errcount
     return list(outq.__dict__['queue'])
 
 
