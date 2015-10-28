@@ -302,7 +302,7 @@ with open('byproblem.txt', 'w') as bp:
 
 # ss = sorted(stats.items(), key=operator.itemgetter(1))
 # print ss
-# TEST
+# //TEST!
 
 with open('bysolutions.txt', 'w') as bs:
     for k, v in sorted(stats.items(), key=operator.itemgetter(1)):
